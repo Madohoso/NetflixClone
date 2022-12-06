@@ -14,6 +14,9 @@ class madoViewController: UIViewController {
         APIhandler.shared.GenericAPIcalling(type: MethodType.getTrendingMovies) { (response: TrendingTitles) in
             print(response)
         }
+        APIhandler.shared.GenericAPIcalling(type: MethodType.getTrendingTvs) { (response: TrendingTitles) in
+            print(response)
+        }
     }
     
 }
