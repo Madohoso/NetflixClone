@@ -20,21 +20,33 @@ enum Sections: Int{
 
 
 class HomeViewController: UIViewController {
-    let sectionTitles:[String] = ["Trending Movies","Trending Tv","Popular", "Upcoming Movies", "Top rated"]
+    
     @IBOutlet weak var homeFeedTable: UITableView!
+    
+    
+    let sectionTitles:[String] = ["Trending Movies","Trending Tv","Popular", "Upcoming Movies", "Top rated"]
+    var results: TrendingTitles?
+    var Title: [mytitle]?
+    var headerView: BigHeaderUIView?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         homeFeedTable.delegate = self
         homeFeedTable.dataSource = self
         NavConfigure()
-        let headerView = BigHeaderUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
+        headerView = BigHeaderUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTable.tableHeaderView = headerView
-        let vc = storyboard?.instantiateViewController(withIdentifier: "TitlePreview")
-        navigationController?.pushViewController(vc!, animated: true)
         navigationItem.backButtonTitle = " "
-//        navigationController?.navigationBar.tintColor = .white
-//        bos ana hena 3amel tr2ten lel titlepreview wahda btsht3'al bs el webview msh zaher wa el tanya msh btzhar aslan
+        configureBigHeader()
+    }
+    func configureBigHeader(){
+        APIhandler.shared.GenericAPIcalling(type: MethodType.getTrendingMovies) { (response: TrendingTitles) in
+            self.results = response
+            self.Title = response.results!
+            let randomTitle = self.Title?.randomElement()
+            self.headerView?.configure(with: randomTitle!)
+        }
     }
     private func NavConfigure(){
         var image = UIImage(named: "logo")
@@ -56,24 +68,25 @@ extension HomeViewController:UITableViewDelegate, UITableViewDataSource{
         }
         cell.delegate = self
         switch indexPath.section{
+            
         case Sections.TrendingMovies.rawValue:
-            APIcaller.shared.getTrendingMovies { response in
+            HomeViewModel.shared.passingData(with: indexPath.section) { response in
                 cell.configure(with: response)
             }
         case Sections.TrendingTv.rawValue:
-            APIcaller.shared.getTrendingTvs { response in
+            HomeViewModel.shared.passingData(with: indexPath.section) { response in
                 cell.configure(with: response)
             }
         case Sections.Popular.rawValue:
-            APIcaller.shared.getPopular{ response in
+            HomeViewModel.shared.passingData(with: indexPath.section) { response in
                 cell.configure(with: response)
             }
         case Sections.Upcoming.rawValue:
-            APIcaller.shared.getUpComing { response in
+            HomeViewModel.shared.passingData(with: indexPath.section) { response in
                 cell.configure(with: response)
             }
         case Sections.TopRated.rawValue:
-            APIcaller.shared.getTopRated { response in
+            HomeViewModel.shared.passingData(with: indexPath.section) { response in
                 cell.configure(with: response)
             }
         default:
@@ -98,7 +111,7 @@ extension HomeViewController:UITableViewDelegate, UITableViewDataSource{
         return sectionTitles[section]
     }
 }
-extension HomeViewController:CollectionViewTbaleViewCellDelegate{
+extension HomeViewController:CollectionViewTableViewCellDelegate{
     func collectionViewTableViewCellDidTapCell(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewModel) {
         DispatchQueue.main.async { [weak self] in
             let vc = TitlePreviewViewController()
