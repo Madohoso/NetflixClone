@@ -14,6 +14,7 @@ class SearchResultsViewController: UIViewController {
     
     public var results = TrendingTitles()
     public var titles = [mytitle]()
+    private let NetworkConnector = ConnectingViewModel()
     weak var delegate: CollectionViewCellDelegate?
     
     public let searchcollectionViewResults: UICollectionView = {
@@ -59,12 +60,15 @@ extension SearchResultsViewController: UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let title = titles[indexPath.row]
+        
         guard let titleName = title.original_title ?? title.original_name else {return}
         guard let titleOverview = title.overview else {return}
-        APIcaller.shared.getMovie(with: titleName + " trailer ") { response in
-            guard let id = response.items?[0].id else{return}
+        
+        NetworkConnector.passingVideoElement(with: titleName + " trailer ") { video in
+            guard let id = video.items?[0].id else {return}
+            
             self.delegate?.DidTapCellforCollectionView(viewModel: TitlePreviewModel(title: titleName, overview: titleOverview, id: id))
         }
-        
     }
 }
+

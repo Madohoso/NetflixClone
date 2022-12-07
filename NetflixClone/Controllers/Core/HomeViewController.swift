@@ -28,6 +28,7 @@ class HomeViewController: UIViewController {
     var results: TrendingTitles?
     var Title: [mytitle]?
     var headerView: BigHeaderUIView?
+    private let NetworkConnector = ConnectingViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,21 +40,35 @@ class HomeViewController: UIViewController {
         homeFeedTable.tableHeaderView = headerView
         navigationItem.backButtonTitle = " "
         configureBigHeader()
+        
     }
+    
     func configureBigHeader(){
-        APIhandler.shared.GenericAPIcalling(type: MethodType.getTrendingMovies) { (response: TrendingTitles) in
-            self.results = response
-            self.Title = response.results!
-            let randomTitle = self.Title?.randomElement()
-            self.headerView?.configure(with: randomTitle!)
+        NetworkConnector.configuringBigHeader { data in
+            self.configurewithData(with: data)
+            let randomtitle = self.Title?.randomElement()
+            self.headerView?.configure(with: randomtitle!)
         }
+        
+        
+        
+        }
+    private func configurewithData(with data: TrendingTitles){
+        self.results = data
+        self.Title = self.results?.results
     }
+    
+    
+    
     private func NavConfigure(){
         var image = UIImage(named: "logo")
         image = image?.withRenderingMode(.alwaysOriginal)
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: image, style: .done, target: self, action: nil)
     }
     }
+
+
+
 extension HomeViewController:UITableViewDelegate, UITableViewDataSource{
     func numberOfSections(in tableView: UITableView) -> Int {
         return sectionTitles.count
@@ -67,27 +82,28 @@ extension HomeViewController:UITableViewDelegate, UITableViewDataSource{
             return UITableViewCell()
         }
         cell.delegate = self
+        
         switch indexPath.section{
             
         case Sections.TrendingMovies.rawValue:
-            HomeViewModel.shared.passingData(with: indexPath.section) { response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getTrendingTvs) { data in
+                cell.configure(with: data)
             }
         case Sections.TrendingTv.rawValue:
-            HomeViewModel.shared.passingData(with: indexPath.section) { response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getTrendingTvs) { data in
+                cell.configure(with: data)
             }
         case Sections.Popular.rawValue:
-            HomeViewModel.shared.passingData(with: indexPath.section) { response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getPopular) { data in
+                cell.configure(with: data)
             }
         case Sections.Upcoming.rawValue:
-            HomeViewModel.shared.passingData(with: indexPath.section) { response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getUpComing) { data in
+                cell.configure(with: data)
             }
         case Sections.TopRated.rawValue:
-            HomeViewModel.shared.passingData(with: indexPath.section) { response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getTopRated) { data in
+                cell.configure(with: data)
             }
         default:
             return UITableViewCell()

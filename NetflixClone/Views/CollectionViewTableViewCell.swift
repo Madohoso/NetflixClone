@@ -11,12 +11,12 @@ protocol CollectionViewTableViewCellDelegate : AnyObject{
 }
 
 class CollectionViewTableViewCell: UITableViewCell {
-     var results = TrendingTitles()
+    
+    private let NetworkConnector = ConnectingViewModel()
+    var results = TrendingTitles()
     var titles = [mytitle]()
-//    var youtubeResults = YoutubeResults()
-//    var VideoElements = [VideoElement]()
-//    var id = IdVideoElement()
     weak var delegate: CollectionViewTableViewCellDelegate?
+    
     @IBOutlet weak var collectionView: UICollectionView!
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -57,10 +57,11 @@ extension CollectionViewTableViewCell:UICollectionViewDelegate,UICollectionViewD
         collectionView.deselectItem(at: indexPath, animated: true)
         let title = titles[indexPath.row]
         guard let titleName = title.original_title ?? title.original_name else {return}
-        guard let titleOveriew = title.overview else {return}
-        APIcaller.shared.getMovie(with: titleName + " trailer ") { response in
-            guard let id = response.items?[0].id else{return}
-            self.delegate?.collectionViewTableViewCellDidTapCell(self, viewModel: TitlePreviewModel(title: titleName, overview: titleOveriew, id: id))
+        guard let titleOverview = title.overview else {return}
+        
+        NetworkConnector.passingVideoElement(with: titleName + " trailer ") { video in
+            guard let id = video.items?[0].id else {return}
+            self.delegate?.collectionViewTableViewCellDidTapCell(self, viewModel: TitlePreviewModel(title: titleName, overview: titleOverview, id: id))
         }
     }
 
