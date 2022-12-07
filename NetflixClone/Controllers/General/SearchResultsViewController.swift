@@ -6,10 +6,17 @@
 //
 
 import UIKit
+protocol CollectionViewCellDelegate: AnyObject{
+    func DidTapCellforCollectionView(viewModel: TitlePreviewModel)
+}
 
 class SearchResultsViewController: UIViewController {
+    
     public var results = TrendingTitles()
     public var titles = [mytitle]()
+    private let NetworkConnector = ConnectingViewModel()
+    weak var delegate: CollectionViewCellDelegate?
+    
     public let searchcollectionViewResults: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: UIScreen.main.bounds.width / 3 - 10, height: 200)
@@ -50,6 +57,18 @@ extension SearchResultsViewController: UICollectionViewDelegate, UICollectionVie
         }
         return cell
     }
-    
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        let title = titles[indexPath.row]
+        
+        guard let titleName = title.original_title ?? title.original_name else {return}
+        guard let titleOverview = title.overview else {return}
+        
+        NetworkConnector.passingVideoElement(with: titleName + " trailer ") { video in
+            guard let id = video.items?[0].id else {return}
+            
+            self.delegate?.DidTapCellforCollectionView(viewModel: TitlePreviewModel(title: titleName, overview: titleOverview, id: id))
+        }
+    }
 }
+

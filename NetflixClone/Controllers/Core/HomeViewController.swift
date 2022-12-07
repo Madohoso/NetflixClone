@@ -20,28 +20,53 @@ enum Sections: Int{
 
 
 class HomeViewController: UIViewController {
-    let sectionTitles:[String] = ["Trending Movies","Trending Tv","Popular", "Upcoming Movies", "Top rated"]
+    
     @IBOutlet weak var homeFeedTable: UITableView!
+    
+    
+    let sectionTitles:[String] = ["Trending Movies","Trending Tv","Popular", "Upcoming Movies", "Top rated"]
+    var results: TrendingTitles?
+    var Title: [mytitle]?
+    var headerView: BigHeaderUIView?
+    private let NetworkConnector = ConnectingViewModel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         homeFeedTable.delegate = self
         homeFeedTable.dataSource = self
         NavConfigure()
-        let headerView = BigHeaderUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
+        headerView = BigHeaderUIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTable.tableHeaderView = headerView
-        let vc = storyboard?.instantiateViewController(withIdentifier: "TitlePreview")
-        navigationController?.pushViewController(vc!, animated: true)
         navigationItem.backButtonTitle = " "
-//        navigationController?.navigationBar.tintColor = .white
-//        bos ana hena 3amel tr2ten lel titlepreview wahda btsht3'al bs el webview msh zaher wa el tanya msh btzhar aslan
+        configureBigHeader()
+        
     }
+   
+    func configureBigHeader(){
+        
+        NetworkConnector.passingData(with: MethodType.getTrendingMovies) { data in
+            self.configurewithData(with: data)
+            let randomtitle = self.Title?.randomElement()
+            self.headerView?.configure(with: randomtitle!)
+        }
+    }
+    private func configurewithData(with data: TrendingTitles){
+        self.results = data
+        self.Title = self.results?.results
+    }
+    
+    
+    
     private func NavConfigure(){
         var image = UIImage(named: "logo")
         image = image?.withRenderingMode(.alwaysOriginal)
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: image, style: .done, target: self, action: nil)
     }
     }
+
+
+
 extension HomeViewController:UITableViewDelegate, UITableViewDataSource{
     func numberOfSections(in tableView: UITableView) -> Int {
         return sectionTitles.count
@@ -55,26 +80,28 @@ extension HomeViewController:UITableViewDelegate, UITableViewDataSource{
             return UITableViewCell()
         }
         cell.delegate = self
+        
         switch indexPath.section{
+            
         case Sections.TrendingMovies.rawValue:
-            APIcaller.shared.getTrendingMovies { response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getTrendingMovies) { data in
+                cell.configure(with: data)
             }
         case Sections.TrendingTv.rawValue:
-            APIcaller.shared.getTrendingTvs { response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getTrendingTvs) { data in
+                cell.configure(with: data)
             }
         case Sections.Popular.rawValue:
-            APIcaller.shared.getPopular{ response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getPopular) { data in
+                cell.configure(with: data)
             }
         case Sections.Upcoming.rawValue:
-            APIcaller.shared.getUpComing { response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getUpComing) { data in
+                cell.configure(with: data)
             }
         case Sections.TopRated.rawValue:
-            APIcaller.shared.getTopRated { response in
-                cell.configure(with: response)
+            NetworkConnector.passingData(with: MethodType.getTopRated) { data in
+                cell.configure(with: data)
             }
         default:
             return UITableViewCell()
@@ -98,7 +125,7 @@ extension HomeViewController:UITableViewDelegate, UITableViewDataSource{
         return sectionTitles[section]
     }
 }
-extension HomeViewController:CollectionViewTbaleViewCellDelegate{
+extension HomeViewController:CollectionViewTableViewCellDelegate{
     func collectionViewTableViewCellDidTapCell(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewModel) {
         DispatchQueue.main.async { [weak self] in
             let vc = TitlePreviewViewController()

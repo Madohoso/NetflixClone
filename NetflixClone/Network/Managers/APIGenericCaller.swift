@@ -26,6 +26,10 @@ enum MethodType{
 protocol urlType{
     var url:String {get}
 }
+enum SearchType{
+    case getMovie
+    case searchForitem
+}
 extension MethodType: urlType{
     var url: String {
         switch self{
@@ -40,14 +44,15 @@ extension MethodType: urlType{
         case .getUpComing:
             return "\(Constants.BASE_URL)/3/movie/upcoming?api_key=\(Constants.API_KEY)"
         case .getDiscoverMovies:
-            return "\(Constants.BASE_URL)/3/discover/movie?api_key=\(Constants.API_KEY)\(Constants.BASE_URL)"
-
+            return "\(Constants.BASE_URL)/3/discover/movie?api_key=\(Constants.API_KEY)\(Constants.DISCOVER_CONSTANT)"
         }
     }
 }
 
 class APIhandler{
     static let shared = APIhandler()
+    
+    
     
     func GenericAPIcalling<T:Codable>(type: MethodType, handler: @escaping (T) -> ()){
         Alamofire.request(type.url).responseJSON { response in
@@ -58,6 +63,37 @@ class APIhandler{
             }
             catch{
                 print(error.localizedDescription)
+            }
+        }
+    }
+    
+    
+    
+    
+    func GenericSearch<T: Codable>(with type: SearchType ,query: String, handler: @escaping(T) -> ()){
+        guard let query = query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {return}
+        switch type{
+        case .getMovie:
+            Alamofire.request("\(Constants.YOUTUBE_BASE_URL)q=\(query)&key=\(Constants.YOUTUBE_API)").responseJSON { response in
+                let decoder = JSONDecoder()
+                do {
+                    let parsedData = try decoder.decode(T.self, from: response.data!)
+                    handler(parsedData)
+                }
+                catch{
+                    print(error.localizedDescription)
+                }
+            }
+        case .searchForitem:
+            Alamofire.request("\(Constants.BASE_URL)/3/search/movie?api_key=\(Constants.API_KEY)&query=\(query)").responseJSON { response in
+                let decoder = JSONDecoder()
+                do {
+                    let parsedData = try decoder.decode(T.self, from: response.data!)
+                    handler(parsedData)
+                }
+                catch{
+                    print(error.localizedDescription)
+                }
             }
         }
     }
