@@ -7,9 +7,9 @@
 
 import UIKit
 
+
 class SearchCollectionViewCell: UICollectionViewCell {
     static let identifier = "SearchCollectionViewCell"
-    
     private let posterImage: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill

@@ -6,7 +6,7 @@
 //
 
 import UIKit
-protocol CollectionViewTbaleViewCellDelegate : AnyObject{
+protocol CollectionViewTableViewCellDelegate : AnyObject{
     func collectionViewTableViewCellDidTapCell(_ cell: CollectionViewTableViewCell, viewModel: TitlePreviewModel)
 }
 
@@ -16,7 +16,7 @@ class CollectionViewTableViewCell: UITableViewCell {
 //    var youtubeResults = YoutubeResults()
 //    var VideoElements = [VideoElement]()
 //    var id = IdVideoElement()
-    weak var delegate: CollectionViewTbaleViewCellDelegate?
+    weak var delegate: CollectionViewTableViewCellDelegate?
     @IBOutlet weak var collectionView: UICollectionView!
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -57,9 +57,10 @@ extension CollectionViewTableViewCell:UICollectionViewDelegate,UICollectionViewD
         collectionView.deselectItem(at: indexPath, animated: true)
         let title = titles[indexPath.row]
         guard let titleName = title.original_title ?? title.original_name else {return}
+        guard let titleOveriew = title.overview else {return}
         APIcaller.shared.getMovie(with: titleName + " trailer ") { response in
-            guard let id = response.items?[indexPath.row].id else{return}
-            self.delegate?.collectionViewTableViewCellDidTapCell(self, viewModel: TitlePreviewModel(title: titleName, id: id))
+            guard let id = response.items?[0].id else{return}
+            self.delegate?.collectionViewTableViewCellDidTapCell(self, viewModel: TitlePreviewModel(title: titleName, overview: titleOveriew, id: id))
         }
     }
 

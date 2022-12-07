@@ -22,6 +22,8 @@ enum MethodType{
     case getUpComing
     case getTopRated
     case getDiscoverMovies
+//    case searchForitem
+//    case getMovie
 }
 protocol urlType{
     var url:String {get}
@@ -41,7 +43,6 @@ extension MethodType: urlType{
             return "\(Constants.BASE_URL)/3/movie/upcoming?api_key=\(Constants.API_KEY)"
         case .getDiscoverMovies:
             return "\(Constants.BASE_URL)/3/discover/movie?api_key=\(Constants.API_KEY)\(Constants.BASE_URL)"
-
         }
     }
 }

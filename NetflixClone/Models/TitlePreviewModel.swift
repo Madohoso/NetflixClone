@@ -9,5 +9,6 @@ import Foundation
 
 struct TitlePreviewModel{
     var title: String?
+    var overview: String?
     var id: IdVideoElement?
 }

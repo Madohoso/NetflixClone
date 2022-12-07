@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class BigHeaderUIView: UIView {
     private let DownloadButton: UIButton = {
@@ -28,7 +29,7 @@ class BigHeaderUIView: UIView {
     }()
     private let BigHeaderImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleToFill
         imageView.clipsToBounds = true
         imageView.image = UIImage(named: "Wednesday")
         return imageView
@@ -36,7 +37,6 @@ class BigHeaderUIView: UIView {
     }()
     private func addGradient(){
         let gradientLayer = CAGradientLayer()
-//        gradientLayer.colors = [UIColor.clear.cgColor, UIColor.systemBackground.cgColor]
         gradientLayer.colors = [UIColor.clear.cgColor , UIColor.systemBackground.cgColor]
         gradientLayer.frame = bounds
         layer.addSublayer(gradientLayer)
@@ -56,7 +56,10 @@ class BigHeaderUIView: UIView {
         NSLayoutConstraint.activate(playButtonConstraints)
         NSLayoutConstraint.activate(DownloadButtonConstraints)
     }
-    
+    public func configure(with model: mytitle){
+        guard let url = URL(string: "https://image.tmdb.org/t/p/w500\(model.poster_path!)") else {return}
+        BigHeaderImage.sd_setImage(with: url)
+    }
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubview(BigHeaderImage)
@@ -74,4 +77,5 @@ class BigHeaderUIView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+  
 }
