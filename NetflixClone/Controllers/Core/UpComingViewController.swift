@@ -12,6 +12,7 @@ class UpComingViewController: UIViewController {
     var results = TrendingTitles()
     var titles = [mytitle]()
     var video = IdVideoElement()
+    let refresh = UIRefreshControl()
     
     private let NetworkConnector = ConnectingViewModel()
     
@@ -23,8 +24,14 @@ class UpComingViewController: UIViewController {
         upComingTable.delegate = self
         upComingTable.dataSource = self
         gettingData()
+        refresh.addTarget(self, action: #selector (refreshData), for: .valueChanged)
+        upComingTable.addSubview(refresh)
     }
-    
+    @objc func refreshData(){
+        gettingData()
+        refresh.endRefreshing()
+        upComingTable.reloadData()
+    }
     
     func configure(with  results: TrendingTitles ){
         self.results = results

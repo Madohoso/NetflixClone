@@ -42,17 +42,15 @@ class HomeViewController: UIViewController {
         configureBigHeader()
         
     }
-    
+   
     func configureBigHeader(){
-        NetworkConnector.configuringBigHeader { data in
+        
+        NetworkConnector.passingData(with: MethodType.getTrendingMovies) { data in
             self.configurewithData(with: data)
             let randomtitle = self.Title?.randomElement()
             self.headerView?.configure(with: randomtitle!)
         }
-        
-        
-        
-        }
+    }
     private func configurewithData(with data: TrendingTitles){
         self.results = data
         self.Title = self.results?.results
@@ -86,7 +84,7 @@ extension HomeViewController:UITableViewDelegate, UITableViewDataSource{
         switch indexPath.section{
             
         case Sections.TrendingMovies.rawValue:
-            NetworkConnector.passingData(with: MethodType.getTrendingTvs) { data in
+            NetworkConnector.passingData(with: MethodType.getTrendingMovies) { data in
                 cell.configure(with: data)
             }
         case Sections.TrendingTv.rawValue:

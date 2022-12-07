@@ -25,15 +25,15 @@ class ConnectingViewModel{
                 handler(data)
             }
         case.getTrendingTvs:
-            APIhandler.shared.GenericAPIcalling(type: MethodType.getTrendingMovies) { data in
+            APIhandler.shared.GenericAPIcalling(type: MethodType.getTrendingTvs) { data in
                 handler(data)
             }
         case.getPopular:
-            APIhandler.shared.GenericAPIcalling(type: MethodType.getTrendingMovies) { data in
+            APIhandler.shared.GenericAPIcalling(type: MethodType.getPopular) { data in
                 handler(data)
             }
         case.getTopRated:
-            APIhandler.shared.GenericAPIcalling(type: MethodType.getTrendingMovies) { data in
+            APIhandler.shared.GenericAPIcalling(type: MethodType.getTopRated) { data in
                 handler(data)
             }
         }
@@ -48,10 +48,5 @@ class ConnectingViewModel{
                 handler(data)
             }
         }
-    func configuringBigHeader(handler: @escaping(TrendingTitles) ->()){
-        APIhandler.shared.GenericAPIcalling(type: MethodType.getTrendingMovies) { data in
-            handler(data)
-        }
-    }
 }
    
